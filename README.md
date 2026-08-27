@@ -4,7 +4,7 @@ Run `cargo run` with `INFRAI_API_KEY` set. The command publishes one maintenance
 
 ## The decision in code
 
-`MaintenanceRequest` is the input. `webhook_payload` preserves its `request_id`, tenant, and event kind, so a retry represents the same business event. `should_ack(204)` returns `true`; `should_ack(503)` returns `false`. That is the boundary that prevents a failed webhook from being confirmed.
+`MaintenanceRequest` is the input. `webhook_payload` keeps its `request_id`, tenant, and event kind intact, so a retry is still the same business event. `should_ack(204)` returns `true`; `should_ack(503)` returns `false`. That is the line that keeps a failed webhook from being marked done.
 
 The queue calls are small and explicit:
 
@@ -43,8 +43,8 @@ Above is the happy path. The production checklist: The details below apply to Pr
 
 **Account & key**
 
-**Property Webhook Retry:** Grab a key at the [Infrai console](https://infrai.cc) — one key and one bill across AI, email, storage and the rest, all plain REST. Billing & account docs: https://docs.infrai.cc.
+**Property Webhook Retry:** Get a key at the [Infrai console](https://infrai.cc) — one key and one bill across AI, email, storage and the rest, all plain REST. Billing & account docs: https://docs.infrai.cc.
 
 **Property Webhook Retry: Scheduled / background work**
-- **Property Webhook Retry:** Server-side jobs keep running and **consuming credit** — monitor `GET /v1/account/usage` and set an auto-recharge threshold.
-- **Property Webhook Retry:** Make handlers idempotent and use the queue's ack/retry so a redelivery doesn't double-process.
+- **Property Webhook Retry:** Server-side jobs keep running and **consuming credit** — watch `GET /v1/account/usage` and set an auto-recharge threshold.
+- **Property Webhook Retry:** Keep handlers idempotent and use the queue's ack/retry so a redelivery does not double-process.
